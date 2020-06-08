@@ -12,11 +12,11 @@ def CIST():
     n_val = request.form.get('n')
     d = request.form.get('d').split(',')
     t = TorusNetwork(int(m_val), int(n_val))
-    x, y = t.getCIST()
+    x, y = t.getStringCIST()
     cist = [{'color': 'red', 'edges': x}, {'color': 'blue', 'edges': y}]
-    r, b = t.getCISTs()
-    t.getProtectionRouting(r, b, (int(d[0]), int(d[1])))
-    mainPath, snhPath = t.getRoutingPath()
+    # r, b = t.getCISTs()
+    # t.getProtectionRouting(r, b, (int(d[0]), int(d[1])))
+    mainPath, snhPath = t.getStringRoutingPath((int(d[0]), int(d[1])))
     totalPath = []
     for m in mainPath:
         color = ''
@@ -53,8 +53,8 @@ def randomSink():
     pathDict = {}
     for d in sinkList:
         t = TorusNetwork(int(m_val)+1, int(n_val)+1)
-        r, b = t.getCISTs()
-        mainPath, _ = t.getProtectionRouting(r, b, d)
+        # r, b = t.getCISTs()
+        mainPath, _ = t.getRoutingPath(d)
         for edge in mainPath:
             if edge in pathDict:
                 pathDict[edge] += 1
@@ -71,6 +71,31 @@ def randomSink():
     return json.dumps(pathloding)
 
 
+@app.route('/period', methods=['POST'])
+def sinkToDPeriod():
+    m_val = request.form.get('m')
+    n_val = request.form.get('n')
+    number = request.form.get('number')
+    d = request.form.get('d').split(',')
+    t = TorusNetwork(int(m_val), int(n_val))
+    data = t.getSinkToDestinationPath(int(number), (int(d[0]), int(d[1])))
+    return json.dumps(data)
+
+
+@app.route('/randomPair', methods=['POST'])
+def randomPairSToDPeriod():
+    m_val = request.form.get('m')
+    n_val = request.form.get('n')
+    number = request.form.get('number')
+    t = TorusNetwork(int(m_val), int(n_val))
+    data = t.getRandomSinkToDestinationPath(int(number))
+    return json.dumps(data)
+
+
+        
+
+
+
 @ app.route('/')
 def index():
     return render_template('svg.html')
@@ -81,4 +106,3 @@ if __name__ == '__main__':
     app.jinja_env.auto_reload = True
     app.debug = True
     app.run()
-

@@ -1,7 +1,7 @@
 var x;
 var y;
 const xmlns = "http://www.w3.org/2000/svg";
-
+var edgePeriodObj;
 
 function init() {
     x = 50;
@@ -19,7 +19,6 @@ function getCIST() {
         data: par,
         dataType: 'json',
         success: function (data) {
-            console.log(data);
             render(data);
         }
     })
@@ -36,8 +35,42 @@ function getRandom() {
         data: par,
         dataType: 'json',
         success: function (data) {
-            console.log(data);
             rederRandom(data);
+        }
+    })
+}
+
+function getPeriod() {
+    const mVal = document.getElementById('m_val').value;
+    const nVal = document.getElementById('n_val').value;
+    const d = document.getElementById('destination').value;
+    const sink_num = document.getElementById('sink_num').value;
+    const par = { m: mVal, n: nVal, number: sink_num, d: d };
+    $.ajax({
+        url: 'period',
+        type: 'POST',
+        data: par,
+        dataType: 'json',
+        success: function (data) {
+            edgePeriodObj = data;
+            renderPeriod(data);
+        }
+    })
+}
+
+function getRandomPeriod() {
+    const mVal = document.getElementById('m_val').value;
+    const nVal = document.getElementById('n_val').value;
+    const sink_num = document.getElementById('sink_num').value;
+    const par = { m: mVal, n: nVal, number: sink_num };
+    $.ajax({
+        url: 'randomPair',
+        type: 'POST',
+        data: par,
+        dataType: 'json',
+        success: function (data) {
+            edgePeriodObj = data;
+            renderPeriod(data);
         }
     })
 }
@@ -76,6 +109,49 @@ function rederRandom(data) {
     contentDiv.appendChild(svg3);
     renderVertex(svg3, mVal, nVal);
     renderPathWithCount(svg3, data)
+}
+
+function renderPeriod(data) {
+    let contentDiv = document.getElementById('content');
+    contentDiv.innerHTML = '';
+    let div1 = document.createElement('div')
+    let slider = document.createElement('input');
+    slider.setAttribute('type', 'range');
+    slider.setAttribute('id', 'slider');
+    slider.setAttribute('min', 1);
+    slider.setAttribute('max', data.maxPeriod)
+    slider.setAttribute('value', 1)
+    slider.setAttribute('oninput', 'changePeriod()');
+    div1.appendChild(slider);
+    let text = document.createElement('span')
+    text.setAttribute('id', 'sliderValue');
+    text.textContent = '目前時間點 : 1';
+    div1.appendChild(text);
+    contentDiv.appendChild(div1);
+    let div2 = document.createElement('div');
+    let mVal = document.getElementById('m_val').value;
+    let nVal = document.getElementById('n_val').value;
+    let svg4 = createSvg(mVal, nVal, 'svg4');
+    div2.appendChild(svg4);
+    contentDiv.appendChild(div2);
+    let edgePeriodList = edgePeriodObj.edgePeriodList;
+    let periodList = edgePeriodList.find(e => e.P == 1).PeriodList;
+    renderVertex(svg4, mVal, nVal);
+    renderPathWithCount(svg4, periodList)
+}
+
+function changePeriod() {
+    let svg4 = document.getElementById('svg4');
+    let slider = document.getElementById('slider');
+    let text = document.getElementById('sliderValue');
+    let mVal = document.getElementById('m_val').value;
+    let nVal = document.getElementById('n_val').value;
+    let edgePeriodList = edgePeriodObj.edgePeriodList;
+    let periodList = edgePeriodList.find(e => e.P == slider.value).PeriodList;
+    svg4.innerHTML = '';
+    text.textContent = `目前時間點 : ${slider.value}`;
+    renderVertex(svg4, mVal, nVal);
+    renderPathWithCount(svg4, periodList)
 }
 
 function createSvg(m, n, svg_id) {
@@ -166,7 +242,7 @@ function createPath(svg, id1, id2, color) {
     svg.appendChild(path);
 }
 
-function createPathWithCount(svg, id1, id2, count) {
+function createPathWithCount(svg, id1, id2, count, type = 'default') {
     const v1 = document.getElementById(`${svg.id}-${id1}`);
     const v2 = document.getElementById(`${svg.id}-${id2}`);
     const v1_xid = parseInt(id1.split(',')[0], 10);
@@ -175,7 +251,11 @@ function createPathWithCount(svg, id1, id2, count) {
     const v2_yid = parseInt(id2.split(',')[1], 10);
     let path = document.createElementNS(xmlns, 'path');
     path.setAttributeNS(null, 'stroke', 'red');
-    path.setAttributeNS(null, 'stroke-width', 2 + (1.03 ** count));
+    if (type === 'period') {
+        path.setAttributeNS(null, 'stroke-width', 2 + count * 1.5);
+    } else {
+        path.setAttributeNS(null, 'stroke-width', 2 + (1.03 ** count));
+    }
 
     let text = document.createElementNS(xmlns, 'text');
     text.textContent = count;
@@ -248,7 +328,6 @@ function createPathWithCount(svg, id1, id2, count) {
 }
 
 function createDirectPath(svg, id1, id2, pathType, color) {
-    console.log(id1, id2);
     const v1 = document.getElementById(`${svg.id}-${id1}`);
     const v2 = document.getElementById(`${svg.id}-${id2}`);
     const v1_xid = parseInt(id1.split(',')[0], 10);
@@ -340,7 +419,7 @@ function renderPath(svg, edgeList, color) {
 
 function renderPathWithCount(svg, edgeList) {
     for (var edge of edgeList) {
-        createPathWithCount(svg, edge[0], edge[1], edge[2]);
+        createPathWithCount(svg, edge[0], edge[1], edge[2], 'period');
     }
 }
 
