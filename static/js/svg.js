@@ -8,36 +8,83 @@ function init() {
     y = 50;
 }
 
+function setLoader(clear = true) {
+    let contentDiv = document.getElementById('content');
+    if (clear === true) {
+        contentDiv.innerHTML = '';
+    }
+    let loader = document.createElement('div');
+    loader.setAttribute('class', 'loader');
+    loader.setAttribute('id', 'loader');
+    contentDiv.appendChild(loader);
+}
+
+function setSnackBar(message) {
+    let bar = document.getElementById('snackbar');
+    bar.textContent = message;
+    bar.className = "show";
+    setTimeout(function () { bar.className = bar.className.replace("show", ""); }, 1500);
+}
+
 function getCIST() {
     const mVal = document.getElementById('m_val').value;
     const nVal = document.getElementById('n_val').value;
     const d = document.getElementById('destination').value;
-    const par = { m: mVal, n: nVal, d: d };
-    $.ajax({
-        url: 'test',
-        type: 'POST',
-        data: par,
-        dataType: 'json',
-        success: function (data) {
-            render(data);
-        }
-    })
+    if (d.length === 0) {
+        setSnackBar('請輸入Destination');
+    } else if (nVal.length === 0) {
+        setSnackBar('請輸入K');
+    } else if (mVal.length === 0) {
+        setSnackBar('請輸入M');
+    } else {
+        const par = { m: mVal, n: nVal, d: d };
+        $.ajax({
+            url: 'test',
+            type: 'POST',
+            data: par,
+            dataType: 'json',
+            success: function (data) {
+                render(data);
+            },
+            beforeSend: function () {
+                setLoader();
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        })
+    }
+
 }
 
 function getRandom() {
     const mVal = document.getElementById('m_val').value;
     const nVal = document.getElementById('n_val').value;
     const sink_num = document.getElementById('sink_num').value;
-    const par = { m: mVal - 1, n: nVal - 1, number: sink_num };
-    $.ajax({
-        url: 'random',
-        type: 'POST',
-        data: par,
-        dataType: 'json',
-        success: function (data) {
-            rederRandom(data);
-        }
-    })
+    if (sink_num.length === 0) {
+        setSnackBar('請輸入隨機數');
+    } else if (nVal.length === 0) {
+        setSnackBar('請輸入K');
+    } else if (mVal.length === 0) {
+        setSnackBar('請輸入M');
+    } else {
+        const par = { m: mVal - 1, n: nVal - 1, number: sink_num };
+        $.ajax({
+            url: 'random',
+            type: 'POST',
+            data: par,
+            dataType: 'json',
+            success: function (data) {
+                rederRandom(data);
+            },
+            // beforeSend: function () {
+            //     setLoader(false);
+            // },
+            // complete: function () {
+            //     $('#loader').hide();
+            // }
+        })
+    }
 }
 
 function getPeriod() {
@@ -45,34 +92,64 @@ function getPeriod() {
     const nVal = document.getElementById('n_val').value;
     const d = document.getElementById('destination').value;
     const sink_num = document.getElementById('sink_num').value;
-    const par = { m: mVal, n: nVal, number: sink_num, d: d };
-    $.ajax({
-        url: 'period',
-        type: 'POST',
-        data: par,
-        dataType: 'json',
-        success: function (data) {
-            edgePeriodObj = data;
-            renderPeriod(data);
-        }
-    })
+    if (sink_num.length === 0) {
+        setSnackBar('請輸入隨機數');
+    } else if (d.length === 0) {
+        setSnackBar('請輸入Destination');
+    } else if (nVal.length === 0) {
+        setSnackBar('請輸入K');
+    } else if (mVal.length === 0) {
+        setSnackBar('請輸入M');
+    } else {
+        const par = { m: mVal, n: nVal, number: sink_num, d: d };
+        $.ajax({
+            url: 'period',
+            type: 'POST',
+            data: par,
+            dataType: 'json',
+            success: function (data) {
+                edgePeriodObj = data;
+                renderPeriod(data);
+            },
+            beforeSend: function () {
+                setLoader();
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        })
+    }
 }
 
 function getRandomPeriod() {
     const mVal = document.getElementById('m_val').value;
     const nVal = document.getElementById('n_val').value;
     const sink_num = document.getElementById('sink_num').value;
-    const par = { m: mVal, n: nVal, number: sink_num };
-    $.ajax({
-        url: 'randomPair',
-        type: 'POST',
-        data: par,
-        dataType: 'json',
-        success: function (data) {
-            edgePeriodObj = data;
-            renderPeriod(data);
-        }
-    })
+    if (sink_num.length === 0) {
+        setSnackBar('請輸入隨機數');
+    } else if (nVal.length === 0) {
+        setSnackBar('請輸入K');
+    } else if (mVal.length === 0) {
+        setSnackBar('請輸入M');
+    } else {
+        const par = { m: mVal, n: nVal, number: sink_num };
+        $.ajax({
+            url: 'randomPair',
+            type: 'POST',
+            data: par,
+            dataType: 'json',
+            success: function (data) {
+                edgePeriodObj = data;
+                renderPeriod(data);
+            },
+            beforeSend: function () {
+                setLoader();
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        })
+    }
 }
 
 function render(torusData) {
@@ -101,7 +178,6 @@ function render(torusData) {
 
 function rederRandom(data) {
     let contentDiv = document.getElementById('content');
-    // contentDiv.innerHTML = "";
     let mVal = document.getElementById('m_val').value;
     let nVal = document.getElementById('n_val').value;
 
@@ -114,7 +190,7 @@ function rederRandom(data) {
 function renderPeriod(data) {
     let contentDiv = document.getElementById('content');
     contentDiv.innerHTML = '';
-    let div1 = document.createElement('div')
+    let div1 = document.createElement('div');
     let slider = document.createElement('input');
     slider.setAttribute('type', 'range');
     slider.setAttribute('id', 'slider');
@@ -137,7 +213,7 @@ function renderPeriod(data) {
     let edgePeriodList = edgePeriodObj.edgePeriodList;
     let periodList = edgePeriodList.find(e => e.P == 1).PeriodList;
     renderVertex(svg4, mVal, nVal);
-    renderPathWithCount(svg4, periodList)
+    renderPathWithCount(svg4, periodList, 'period');
 }
 
 function changePeriod() {
@@ -151,7 +227,7 @@ function changePeriod() {
     svg4.innerHTML = '';
     text.textContent = `目前時間點 : ${slider.value}`;
     renderVertex(svg4, mVal, nVal);
-    renderPathWithCount(svg4, periodList)
+    renderPathWithCount(svg4, periodList, 'period')
 }
 
 function createSvg(m, n, svg_id) {
@@ -162,7 +238,6 @@ function createSvg(m, n, svg_id) {
     svg.id = svg_id;
     return svg;
 }
-
 
 function createCircle(svg, x, y, id) {
     let g = document.createElementNS(xmlns, 'g');
@@ -417,9 +492,9 @@ function renderPath(svg, edgeList, color) {
     }
 }
 
-function renderPathWithCount(svg, edgeList) {
+function renderPathWithCount(svg, edgeList, type = 'default') {
     for (var edge of edgeList) {
-        createPathWithCount(svg, edge[0], edge[1], edge[2], 'period');
+        createPathWithCount(svg, edge[0], edge[1], edge[2], type);
     }
 }
 
