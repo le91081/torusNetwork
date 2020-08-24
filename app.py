@@ -76,17 +76,27 @@ def randomPairSToDPeriod():
     m_val = request.form.get('m')
     n_val = request.form.get('n')
     number = request.form.get('number')
+    times = request.form.get('times')
     t = TorusNetwork(int(m_val), int(n_val))
-    data = t.getRandomSinkToDestinationPath(int(number))
+    # data = t.getRandomSinkToDestinationPath(int(number))
+    data = t.getMultiRandomSinkToDestinationPath(int(number),int(times))
     return json.dumps(data)
+
 
 @ app.route('/')
 def index():
-    return render_template('svg.html')
+    return render_template('index.html')
+    # return render_template('svg.html')
 
+@ app.route('/routing')
+def routing():
+    return render_template('routing.html')
+
+@ app.route('/transmitt')
+def transmitt():
+    return render_template('transmitt.html')
 
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.jinja_env.auto_reload = True
-    app.debug = True
-    app.run()
+    app.run(debug=True)

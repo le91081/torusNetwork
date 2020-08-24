@@ -373,6 +373,57 @@ class TorusNetwork:
 
         return edgePeriodObj
 
+    # def getRandomSinkToDestinationPath(self,pairNum):
+    #     total = []
+    #     isUse = []
+    #     obj = {}
+    #     maxP = 0
+    #     m = self.__m
+    #     k = self.__k
+    #     while len(total) != pairNum:
+    #         d = (random.randint(0,m-1),random.randint(0,k-1))
+    #         s = (random.randint(0,m-1),random.randint(0,k-1))
+    #         if s == d or (s,d) in isUse:
+    #                 continue
+    #         mainPath,_ = self.getRoutingPath(d)
+    #         p = []
+    #         isUse.append((s,d))
+    #         while s != d:
+    #             for edge in mainPath:
+    #                 if edge[0] == s:
+    #                     p.append(edge)
+    #                     s = edge[1]
+    #         total.append(p)
+    #     for edgeList in total:
+    #         period = 1
+    #         for edge in edgeList:
+    #             e = (edge[0],edge[1],period)
+    #             e_reverse = (edge[1],edge[0],period)
+    #             if e in obj:
+    #                 obj[e] += 1
+    #             elif e_reverse in obj and e in obj:
+    #                 obj[e] += 1
+    #             elif e_reverse in obj and e not in obj:
+    #                 obj[e_reverse] += 1
+    #             else:
+    #                 obj[e] = 1
+    #             period += 1
+    #         if period > maxP:
+    #             maxP = (period - 1)
+    #         period = 0
+    #     edgePeriodList = []
+    #     for p in range(maxP):
+    #         temp = []
+    #         for i in obj.items():
+    #             if i[0][2] == (p+1):
+    #                 n1 = '{},{}'.format(i[0][0][0],i[0][0][1])
+    #                 n2 = '{},{}'.format(i[0][1][0],i[0][1][1])
+    #                 temp.append([n1,n2,i[1]])
+    #         edgePeriodList.append({'P':p+1,'PeriodList':temp})
+    #     edgePeriodObj = {'maxPeriod':maxP,'edgePeriodList':edgePeriodList}
+
+    #     return edgePeriodObj
+
     def getRandomSinkToDestinationPath(self,pairNum):
         total = []
         isUse = []
@@ -383,11 +434,12 @@ class TorusNetwork:
         while len(total) != pairNum:
             d = (random.randint(0,m-1),random.randint(0,k-1))
             s = (random.randint(0,m-1),random.randint(0,k-1))
-            if s == d or (s,d) in isUse:
+            if s == d or (s,d) in isUse or s in isUse:
                     continue
             mainPath,_ = self.getRoutingPath(d)
             p = []
             isUse.append((s,d))
+            isUse.append(s)
             while s != d:
                 for edge in mainPath:
                     if edge[0] == s:
@@ -398,19 +450,63 @@ class TorusNetwork:
             period = 1
             for edge in edgeList:
                 e = (edge[0],edge[1],period)
-                e_reverse = (edge[1],edge[0],period)
                 if e in obj:
                     obj[e] += 1
-                elif e_reverse in obj and e in obj:
-                    obj[e] += 1
-                elif e_reverse in obj and e not in obj:
-                    obj[e_reverse] += 1
                 else:
                     obj[e] = 1
                 period += 1
             if period > maxP:
                 maxP = (period - 1)
             period = 0
+        edgePeriodList = []
+        for p in range(maxP):
+            temp = []
+            for i in obj.items():
+                if i[0][2] == (p+1):
+                    n1 = '{},{}'.format(i[0][0][0],i[0][0][1])
+                    n2 = '{},{}'.format(i[0][1][0],i[0][1][1])
+                    temp.append([n1,n2,i[1]])
+            edgePeriodList.append({'P':p+1,'PeriodList':temp})
+        edgePeriodObj = {'maxPeriod':maxP,'edgePeriodList':edgePeriodList}
+
+        return edgePeriodObj
+
+    def getMultiRandomSinkToDestinationPath(self,pairNum,times):
+        obj = {}
+        maxP = 0
+        m = self.__m
+        k = self.__k
+        r = 1
+        while r <= times:
+            total = []
+            isUse = []
+            while len(total) != pairNum:
+                d = (random.randint(0,m-1),random.randint(0,k-1))
+                s = (random.randint(0,m-1),random.randint(0,k-1))
+                if s == d or (s,d) in isUse or s in isUse:
+                        continue
+                mainPath,_ = self.getRoutingPath(d)
+                p = []
+                isUse.append((s,d))
+                isUse.append(s)
+                while s != d:
+                    for edge in mainPath:
+                        if edge[0] == s:
+                            p.append(edge)
+                            s = edge[1]
+                total.append(p)
+            for edgeList in total:
+                period = r
+                for edge in edgeList:
+                    e = (edge[0],edge[1],period)
+                    if e in obj:
+                        obj[e] += 1
+                    else:
+                        obj[e] = 1
+                    period += 1
+                if period > maxP:
+                    maxP = (period - 1)
+            r += 1
         edgePeriodList = []
         for p in range(maxP):
             temp = []

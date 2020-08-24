@@ -8,23 +8,28 @@
 <body>
   <div class="main">
     <div id="snackbar"></div>
+    <div class="tool-menu">
+      <button type="button">Protection Routing</button>
+      <button type="button">Packages Transmission</button>
+    </div>
     <div class="tool-bar">
       <input type="number" id="m_val" placeholder="輸入M" />
       <input type="number" id="n_val" placeholder="輸入K" />
-      <input type="text" id="destination" placeholder="輸入Destination" required/>
+      <input type="text" id="destination" placeholder="輸入Destination" required />
       <div class="tooltip">
         <button type="button" onclick="getCIST()">Generate</button>
         <span class="tooltiptext">請輸入前兩項M*K及Destination</span>
       </div>
-      <input type="text" id="sink_num" placeholder="輸入" />
-      <div class="tooltip">
+      <!-- <input type="text" id="sink_num" placeholder="輸入" /> -->
+      <input type="text" id="times_num" placeholder="輸入隨機數" />
+      <!-- <div class="tooltip">
         <button type="button" onclick="getRandom()">Random</button>
         <span class="tooltiptext">產出隨機點到Destination使用之邊統計</span>
-      </div>
-      <div class="tooltip">
+      </div> -->
+      <!-- <div class="tooltip">
         <button type="button" onclick="getPeriod()">SendPackege</button>
         <span class="tooltiptext">產出隨機點到給定Destination路徑之各時間點使用之邊統計</span>
-      </div>
+      </div> -->
       <div class="tooltip">
         <button type="button" onclick="getRandomPeriod()">RandomSend</button>
         <span class="tooltiptext">產出隨機點到隨機Destination使用之各時間點路徑之邊統計</span>

@@ -44,6 +44,7 @@ function getCIST() {
             data: par,
             dataType: 'json',
             success: function (data) {
+                console.log(data);
                 render(data);
             },
             beforeSend: function () {
@@ -125,6 +126,7 @@ function getRandomPeriod() {
     const mVal = document.getElementById('m_val').value;
     const nVal = document.getElementById('n_val').value;
     const sink_num = document.getElementById('sink_num').value;
+    const times_num = document.getElementById('times_num').value;
     if (sink_num.length === 0) {
         setSnackBar('請輸入隨機數');
     } else if (nVal.length === 0) {
@@ -132,7 +134,7 @@ function getRandomPeriod() {
     } else if (mVal.length === 0) {
         setSnackBar('請輸入M');
     } else {
-        const par = { m: mVal, n: nVal, number: sink_num };
+        const par = { m: mVal, n: nVal, number: sink_num, times: times_num };
         $.ajax({
             url: 'randomPair',
             type: 'POST',
@@ -184,7 +186,7 @@ function rederRandom(data) {
     let svg3 = createSvg(mVal, nVal, 'svg3');
     contentDiv.appendChild(svg3);
     renderVertex(svg3, mVal, nVal);
-    renderPathWithCount(svg3, data)
+    renderPathWithCount(svg3, data);
 }
 
 function renderPeriod(data) {
@@ -208,12 +210,18 @@ function renderPeriod(data) {
     let mVal = document.getElementById('m_val').value;
     let nVal = document.getElementById('n_val').value;
     let svg4 = createSvg(mVal, nVal, 'svg4');
+    div2.setAttribute('id','periodDiv');
     div2.appendChild(svg4);
     contentDiv.appendChild(div2);
     let edgePeriodList = edgePeriodObj.edgePeriodList;
     let periodList = edgePeriodList.find(e => e.P == 1).PeriodList;
     renderVertex(svg4, mVal, nVal);
-    renderPathWithCount(svg4, periodList, 'period');
+    // renderPathWithCount(svg4, periodList, 'period');
+    renderBidirectPeriodPath(svg4, periodList, 'period');
+    let div3 = document.createElement('div');
+    div3.setAttribute('id', 'pathText');
+    contentDiv.appendChild(div3);
+    renderPathText(periodList);
 }
 
 function changePeriod() {
@@ -227,7 +235,9 @@ function changePeriod() {
     svg4.innerHTML = '';
     text.textContent = `目前時間點 : ${slider.value}`;
     renderVertex(svg4, mVal, nVal);
-    renderPathWithCount(svg4, periodList, 'period')
+    // renderPathWithCount(svg4, periodList, 'period')
+    renderBidirectPeriodPath(svg4, periodList, 'period');
+    renderPathText(periodList);
 }
 
 function createSvg(m, n, svg_id) {
@@ -473,6 +483,88 @@ function createDirectPath(svg, id1, id2, pathType, color) {
     svg.appendChild(path);
 }
 
+function createBidirectPathWithCount(svg, id1, id2, count, type = 'default') {
+    const v1 = document.getElementById(`${svg.id}-${id1}`);
+    const v2 = document.getElementById(`${svg.id}-${id2}`);
+    const v1_xid = parseInt(id1.split(',')[0], 10);
+    const v1_yid = parseInt(id1.split(',')[1], 10);
+    const v2_xid = parseInt(id2.split(',')[0], 10);
+    const v2_yid = parseInt(id2.split(',')[1], 10);
+    let path = document.createElementNS(xmlns, 'path');
+    path.setAttributeNS(null, 'stroke', 'red');
+    path.setAttributeNS(null, 'stroke-width', 3);
+    let text = document.createElementNS(xmlns, 'text');
+    text.textContent = count;
+    text.setAttributeNS(null, 'stroke', '#333');
+    if ((v1_yid - v2_yid) > 1) {
+        const M = `M${v2.cx.animVal.value + 15},${v2.cy.animVal.value - 15}`;
+        const Q = ` Q${(v1.cx.animVal.value - v2.cx.animVal.value) / 2 + v2.cx.animVal.value} ${v1.cy.animVal.value - 70} `;
+        const L = `${v1.cx.animVal.value - 15},${v1.cy.animVal.value - 15}`;
+        path.setAttributeNS(null, 'd', M + Q + L);
+        path.setAttributeNS(null, 'fill', 'transparent');
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value + 15);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value - 15);
+        path.setAttributeNS(null, 'marker-start', `url(#red-start)`);
+    } else if ((v1_xid - v2_xid) > 1) {
+        const M = `M${v2.cx.animVal.value + 15},${v2.cy.animVal.value + 15}`;
+        const Q = ` Q${v1.cx.animVal.value + 80} ${(v1.cy.animVal.value - v2.cy.animVal.value) / 2 + v2.cy.animVal.value} `;
+        const L = `${v1.cx.animVal.value + 15},${v1.cy.animVal.value - 15}`;
+        path.setAttributeNS(null, 'd', M + Q + L);
+        path.setAttributeNS(null, 'fill', 'transparent');
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value + 22);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value + 30);
+        path.setAttributeNS(null, 'marker-start', `url(#red-start)`);
+    } else if (v1_xid > v2_xid) {
+        const M = `M${v2.cx.animVal.value - 10},${v2.cy.animVal.value + 15}`;
+        const L = `L${v1.cx.animVal.value - 10},${v1.cy.animVal.value - 15}`;
+        path.setAttributeNS(null, 'd', M + L);
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value - 20);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value + 35);
+        path.setAttributeNS(null, 'marker-start', `url(#red-start)`);
+    } else if (v1_yid > v2_yid) {
+        const M = `M${v2.cx.animVal.value + 15},${v2.cy.animVal.value + 10}`;
+        const L = `L${v1.cx.animVal.value - 15},${v1.cy.animVal.value + 10}`;
+        path.setAttributeNS(null, 'd', M + L);
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value + 23);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value + 5);
+        path.setAttributeNS(null, 'marker-start', `url(#red-start)`);
+    } else if ((v2_yid - v1_yid) > 1) {
+        const M = `M${v1.cx.animVal.value + 15},${v1.cy.animVal.value - 15}`;
+        const Q = ` Q${(v2.cx.animVal.value - v1.cx.animVal.value) / 2 + v1.cx.animVal.value} ${v2.cy.animVal.value - 70} `;
+        const L = `${v2.cx.animVal.value - 15},${v2.cy.animVal.value - 15}`;
+        path.setAttributeNS(null, 'd', M + Q + L);
+        path.setAttributeNS(null, 'fill', 'transparent');
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value - 26);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value - 24);
+        path.setAttributeNS(null, 'marker-end', `url(#red)`);
+    } else if ((v2_xid - v1_xid) > 1) {
+        const M = `M${v1.cx.animVal.value + 15},${v1.cy.animVal.value + 15}`;
+        const Q = ` Q${v2.cx.animVal.value + 80} ${(v2.cy.animVal.value - v1.cy.animVal.value) / 2 + v1.cy.animVal.value} `;
+        const L = `${v2.cx.animVal.value + 15},${v2.cy.animVal.value - 15}`;
+        path.setAttributeNS(null, 'd', M + Q + L);
+        path.setAttributeNS(null, 'fill', 'transparent');
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value + 20);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value - 25);
+        path.setAttributeNS(null, 'marker-end', `url(#red)`);
+    } else if (v2_xid > v1_xid) {
+        const M = `M${v1.cx.animVal.value + 10},${v1.cy.animVal.value + 15}`;
+        const L = `L${v2.cx.animVal.value + 10},${v2.cy.animVal.value - 15}`;
+        path.setAttributeNS(null, 'd', M + L);
+        text.setAttributeNS(null, 'x', v1.cx.animVal.value);
+        text.setAttributeNS(null, 'y', v2.cy.animVal.value - 25);
+        path.setAttributeNS(null, 'marker-end', `url(#red)`);
+    } else {
+        const M = `M${v1.cx.animVal.value + 15},${v1.cy.animVal.value - 10}`;
+        const L = `L${v2.cx.animVal.value - 15},${v2.cy.animVal.value - 10}`;
+        path.setAttributeNS(null, 'd', M + L);
+        text.setAttributeNS(null, 'x', v2.cx.animVal.value - 33);
+        text.setAttributeNS(null, 'y', v1.cy.animVal.value - 14);
+        path.setAttributeNS(null, 'marker-end', `url(#red)`);
+    }
+    svg.appendChild(path);
+    svg.appendChild(text);
+}
+
 function renderVertex(svg, m, n) {
     init();
     for (var i = 0; i < m; i++) {
@@ -494,7 +586,8 @@ function renderPath(svg, edgeList, color) {
 
 function renderPathWithCount(svg, edgeList, type = 'default') {
     for (var edge of edgeList) {
-        createPathWithCount(svg, edge[0], edge[1], edge[2], type);
+        // createPathWithCount(svg, edge[0], edge[1], edge[2], type);
+        createBidirectPathWithCount(svg, edge[0], edge[1], edge[2], type);
     }
 }
 
@@ -538,6 +631,73 @@ function renderRouting(svg, edgeList) {
         createDirectPath(svg, edge.path[0], edge.path[1], edge.pathType, edge.color);
     }
 
+}
+
+function renderBidirectPeriodPath(svg, edgeList, type = 'default') {
+    let defs = document.createElementNS(xmlns, 'defs');
+    let path = document.createElementNS(xmlns, 'path');
+    path.setAttributeNS(null, 'd', 'M0,0 V4 L2,2 Z');
+    path.setAttributeNS(null, 'stroke', 'red');
+    path.setAttributeNS(null, 'fill', 'red');
+    let markerEnd = document.createElementNS(xmlns, 'marker');
+    markerEnd.setAttributeNS(null, 'id', 'red');
+    markerEnd.setAttributeNS(null, 'orient', 'auto');
+    markerEnd.setAttributeNS(null, 'markerWidth', '5');
+    markerEnd.setAttributeNS(null, 'markerHeight', '5');
+    markerEnd.setAttributeNS(null, 'refX', '2.3');
+    markerEnd.setAttributeNS(null, 'refY', '2');
+    markerEnd.appendChild(path);
+    defs.appendChild(markerEnd);
+
+    let path_copy = document.createElementNS(xmlns, 'path');
+    path_copy.setAttributeNS(null, 'd', 'M0,0 V4 L2,2 Z');
+    path_copy.setAttributeNS(null, 'stroke', 'red');
+    path_copy.setAttributeNS(null, 'fill', 'red');
+    let marker = document.createElementNS(xmlns, 'marker');
+    marker.setAttributeNS(null, 'id', 'red-start');
+    marker.setAttributeNS(null, 'orient', 'auto-start-reverse');
+    marker.setAttributeNS(null, 'markerWidth', '5');
+    marker.setAttributeNS(null, 'markerHeight', '5');
+    marker.setAttributeNS(null, 'refX', '2.3');
+    marker.setAttributeNS(null, 'refY', '2');
+    marker.appendChild(path_copy);
+    defs.appendChild(marker);
+
+    svg.appendChild(defs);
+
+    for (var edge of edgeList) {
+        createBidirectPathWithCount(svg, edge[0], edge[1], edge[2], type);
+    }
+
+
+}
+
+function renderPathText(edgeList) {
+    console.log(edgeList);
+    let contentDiv = document.getElementById('content');
+    let div1 = document.getElementById('pathText');
+    let div2 = document.getElementById('periodDiv');
+
+    div1.innerHTML = '';
+    let count = 1;
+    edgeList.sort((a, b) => {
+        return b[2] - a[2]
+    }).forEach(edge => {
+        let text = document.createElement('text');
+        text.textContent = `( ${edge[0]} , ${edge[1]} ) : ${edge[2]} `;
+        text.style.marginLeft = '8px';
+        div1.appendChild(text);
+        if (count % 5 === 0) {
+            let br = document.createElement('br');
+            div1.appendChild(br);
+        } 
+        count++;
+    })
+    div1.style.marginLeft = '16px';
+    div2.style.display = 'flex';
+    div2.style.flexWrap = 'wrap';
+    div2.appendChild(div1);
+    // contentDiv.appendChild(div2);
 }
 
 

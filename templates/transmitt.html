@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+{% block content %}
+    <input type="number" id="m_val" placeholder="輸入M" />
+    <input type="number" id="n_val" placeholder="輸入K" />
+    <input type="text" id="sink_num" placeholder="輸入" />
+    <input type="text" id="times_num" placeholder="輸入隨機數" />
+    <div class="tooltip">
+        <button type="button" onclick="getRandomPeriod()">RandomSend</button>
+        <span class="tooltiptext">產出隨機點到隨機Destination使用之各時間點路徑之邊統計</span>
+      </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/svg.js') }}"></script>
+{% endblock %}
