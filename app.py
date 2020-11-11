@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from torusNetwork import TorusNetwork
+from DenseGausian import DensGaussianNetwork
 import random
 import json
 
@@ -29,6 +30,33 @@ def CIST():
         par = {'path': s, 'pathType': 's', 'color': color}
         totalPath.append(par)
     data = {'CIST': cist, 'RoutingPath': totalPath}
+    return json.dumps(data)
+
+
+@app.route('/DNGCirculant', methods=['POST'])
+def circulantCIST():
+    k = request.form.get('k')
+    d = request.form.get('d')
+    # d = 0
+    print('Call CIST function!!')
+    t = DensGaussianNetwork(int(k))
+    b, r = t.getStringCIST()
+    cists = [{'color': 'blue', 'edges': b}, {'color': 'red', 'edges': r}]
+    mainPath, snhPath = t.getStringRoutingPath(int(d))
+    totalPath = []
+    for m in mainPath:
+        color = ''
+        if m in b or m[::-1] in b:
+            color = 'blue'
+        elif m in r or m[::-1] in r:
+            color = 'red'
+        par = {'path': m, 'pathType': 'm', 'color': color}
+        totalPath.append(par)
+    for s in snhPath:
+        color = 'gray'
+        par = {'path': s, 'pathType': 's', 'color': color}
+        totalPath.append(par)
+    data = {'CIST': cists, 'RoutingPath': totalPath}
     return json.dumps(data)
 
 
@@ -79,7 +107,7 @@ def randomPairSToDPeriod():
     times = request.form.get('times')
     t = TorusNetwork(int(m_val), int(n_val))
     # data = t.getRandomSinkToDestinationPath(int(number))
-    data = t.getMultiRandomSinkToDestinationPath(int(number),int(times))
+    data = t.getMultiRandomSinkToDestinationPath(int(number), int(times))
     return json.dumps(data)
 
 
@@ -88,13 +116,26 @@ def index():
     return render_template('index.html')
     # return render_template('svg.html')
 
+
 @ app.route('/routing')
 def routing():
     return render_template('routing.html')
 
+
 @ app.route('/transmitt')
 def transmitt():
     return render_template('transmitt.html')
+
+
+@ app.route('/circulant')
+def circulant():
+    return render_template('circulant.html')
+
+
+@ app.route('/dgn')
+def dgn():
+    return render_template('dgn.html')
+
 
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True

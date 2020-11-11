@@ -1,0 +1,13 @@
+{% extends 'index.html' %}
+{% block content %}
+<input type="number" id="k_val" min="3" value="3" placeholder="輸入K" />
+<input type="text" id="destination" value="0" placeholder="輸入Destination" required />
+<div class="tooltip">
+    <button type="button" onclick="getCIST()">Generate</button>
+    <span class="tooltiptext">請輸入K及Destination</span>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/dgn.js') }}"></script>
+{% endblock %}

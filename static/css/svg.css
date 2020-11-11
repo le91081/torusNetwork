@@ -7,6 +7,10 @@ button {
     background-color: #eeeeee;
 }
 
+.tool-bar {
+    margin-top: 8px;
+}
+
 .loader {
     border: 5px solid #f3f3f3; /* Light grey */
     border-top: 5px solid #555; /* Blue */
