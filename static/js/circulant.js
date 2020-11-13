@@ -111,7 +111,7 @@ function renderRouting(svg, edgeList) {
     svg.appendChild(defs);
 
     for (let edge of edgeList) {
-        console.log(edge.path)
+        // console.log(edge.path)
         createDirectPath(svg, edge.path[0], edge.path[1], edge.pathType, edge.color);
     }
 

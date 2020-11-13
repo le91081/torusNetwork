@@ -172,7 +172,7 @@ function createDirectPath(svg, k, g, id1, id2, pathType, color) {
     // console.log(id1, id2, d);
 
     if (d === k) {
-        console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'E')
+        // console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'E')
         const M = `M${v1.cx.animVal.value},${v1.cy.animVal.value}`;
         const H = `H${v1.cx.animVal.value + 65}`;
         path.setAttributeNS(null, 'd', M + H);
@@ -193,7 +193,7 @@ function createDirectPath(svg, k, g, id1, id2, pathType, color) {
         }
 
     } else if (d === (k + 1)) {
-        console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'N')
+        // console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'N')
         const M = `M${v1.cx.animVal.value},${v1.cy.animVal.value}`;
         const V = `V${v1.cy.animVal.value - 65}`;
         path.setAttributeNS(null, 'd', M + V);
@@ -213,7 +213,7 @@ function createDirectPath(svg, k, g, id1, id2, pathType, color) {
             createWraparoungCircle(svg, g, v2.cx.animVal.value, v2.cy.animVal.value + 80, id1);
         }
     } else if ((parseInt(id2) - parseInt(id1)) === -k || mod(parseInt(id1) - parseInt(id2), n) === k) {
-        console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'W')
+        // console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'W')
         const M = `M${v1.cx.animVal.value},${v1.cy.animVal.value}`;
         const H = `H${v1.cx.animVal.value - 65}`;
         path.setAttributeNS(null, 'd', M + H);
@@ -234,7 +234,7 @@ function createDirectPath(svg, k, g, id1, id2, pathType, color) {
         }
 
     } else {
-        console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'S')
+        // console.log('from: ' + id1, 'To: ' + id2, 'D:' + d, 'S')
         const M = `M${v1.cx.animVal.value},${v1.cy.animVal.value}`;
         const V = `V${v1.cy.animVal.value + 65}`;
         path.setAttributeNS(null, 'd', M + V);

@@ -13,9 +13,9 @@
       <button type="button">Packages Transmission</button>
     </div>
     <div class="tool-bar">
-      <input type="number" id="m_val" placeholder="輸入M" />
-      <input type="number" id="n_val" placeholder="輸入K" />
-      <input type="text" id="destination" placeholder="輸入Destination" required />
+      <input type="number" id="m_val" min="3" value="3" placeholder="輸入M" />
+      <input type="number" id="n_val" min="3" value="3" placeholder="輸入K" />
+      <input type="text" id="destination" value="0,0" placeholder="輸入Destination" required />
       <div class="tooltip">
         <button type="button" onclick="getCIST()">Generate</button>
         <span class="tooltiptext">請輸入前兩項M*K及Destination</span>
