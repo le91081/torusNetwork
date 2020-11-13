@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for, redirect
 from torusNetwork import TorusNetwork
 from DenseGausian import DensGaussianNetwork
 import random
@@ -113,7 +113,9 @@ def randomPairSToDPeriod():
 
 @ app.route('/')
 def index():
-    return render_template('index.html')
+    # return render_template('index.html')
+    return redirect(url_for('routing'))
+
     # return render_template('svg.html')
 
 
