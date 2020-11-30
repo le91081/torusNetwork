@@ -111,6 +111,16 @@ def randomPairSToDPeriod():
     return json.dumps(data)
 
 
+@app.route('/dgnRandomPair', methods=['POST'])
+def dgnRandomPairSToDPeriod():
+    k = request.form.get('k')
+    number = request.form.get('number')
+    times = request.form.get('times')
+    t = DensGaussianNetwork(int(k))
+    data = t.getMultiRandomSinkToDestinationPath(int(number), int(times))
+    return json.dumps(data)
+
+
 @ app.route('/')
 def index():
     # return render_template('index.html')
@@ -137,6 +147,11 @@ def circulant():
 @ app.route('/dgn')
 def dgn():
     return render_template('dgn.html')
+
+
+@ app.route('/dngTransmitt')
+def dngTransmitt():
+    return render_template('dngTransmitt.html')
 
 
 if __name__ == '__main__':

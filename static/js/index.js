@@ -13,3 +13,7 @@ function toCirculant() {
 function toDGN() {
     window.location.href = 'dgn';
 }
+
+function toDGNPackageTrasmitt() {
+    window.location.href = 'dngTransmitt';
+}

@@ -1,4 +1,5 @@
 import math
+import random
 
 
 class DensGaussianNetwork():
@@ -316,3 +317,54 @@ class DensGaussianNetwork():
     def getStringRoutingPath(self, d):
         self.__getProtectionRouting(d)
         return self.__changeEdgeToString(self.__mainPath), self.__changeEdgeToString(self.__snhPath)
+
+    def getMultiRandomSinkToDestinationPath(self, pairNum, times):
+        obj = {}
+        maxP = 0
+        k = self.__k
+        n = 2*k*k+2*k+1
+        r = 1
+        while r <= times:
+            total = []
+            isUse = []
+            while len(total) != pairNum:
+                d = random.randint(0, n-1)
+                s = random.randint(0, n-1)
+                if s == d or (s, d) in isUse or s in isUse:
+                    continue
+                print(s, d)
+                mainPath, _ = self.getRoutingPath(d)
+                p = []
+                isUse.append((s, d))
+                isUse.append(s)
+                while s != d:
+                    for edge in mainPath:
+                        if edge[0] == s:
+                            p.append(edge)
+                            s = edge[1]
+                total.append(p)
+            for edgeList in total:
+                period = r
+                for edge in edgeList:
+                    e = (edge[0], edge[1], period)
+                    if e in obj:
+                        obj[e] += 1
+                    else:
+                        obj[e] = 1
+                    period += 1
+                if period > maxP:
+                    maxP = (period - 1)
+            r += 1
+        edgePeriodList = []
+        for p in range(maxP):
+            temp = []
+            for i in obj.items():
+                if i[0][2] == (p+1):
+                    n1 = '{}'.format(i[0][0])
+                    n2 = '{}'.format(i[0][1])
+                    temp.append([n1, n2, i[1]])
+            edgePeriodList.append({'P': p+1, 'PeriodList': temp})
+        edgePeriodObj = {'maxPeriod': maxP, 'edgePeriodList': edgePeriodList}
+#         print(edgePeriodObj)
+
+        return edgePeriodObj
